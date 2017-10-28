@@ -1,4 +1,3 @@
-from numpy.random import *
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
@@ -12,6 +11,7 @@ import datetime
 import json
 import itertools
 import collections
+import os
 
 def plot_two_spreads(ex_1, ex_2, period_hour):
     spread_a_list = []
@@ -32,7 +32,7 @@ def plot_two_spreads(ex_1, ex_2, period_hour):
 
     df_spread['date']=df_spread.index
     df_spread['date']=pd.to_datetime(df_spread['date'], format='%Y-%m-%d-%H:%M:%S')
-    df_spread=df_spread[(df_spread.date>dt_now - datetime.timedelta(hour=period_hour)) & (df_spread.date<dt_now)]
+    df_spread=df_spread[(df_spread.date>dt_now - datetime.timedelta(hours=period_hour)) & (df_spread.date<dt_now)]
 
     plt.figure()
     ax = df_spread[ex_1+"_bid-"+ex_2+"_ask"].plot.hist(bins=100, range=(-6000, 6000), alpha=0.6,legend=True)
@@ -72,6 +72,7 @@ while True:
     dt_now = datetime.datetime.now()
     last_update_min = 0
     # フォルダ作成
+    input_folder_name = "./simulation_data/"
     # global output_folder_name
     output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/spread_image/"+dt_now.month+dt_now.day + "/"
 
@@ -80,14 +81,14 @@ while True:
 
     # データ読み取り
     # その日
-    with open("simulation_data/2017-"+str(dt_now.month)+"-"+str(day)+"ticker_log.json") as data_file:
+    with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day)+"ticker_log.json") as data_file:
         data_json_today = json.load(data_file)
-        ticker_log_today = collections.OrderedDict(sorted(data_json.items()))
+        ticker_log_today = collections.OrderedDict(sorted(data_json_today.items()))
 
     # 前の日
-    with open("simulation_data/2017-"+str(dt_now.month)+"-"+str(day-1)+"ticker_log.json") as data_file:
+    with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day-1)+"ticker_log.json") as data_file:
         data_json_yesterday = json.load(data_file)
-        ticker_log_yesterday = collections.OrderedDict(sorted(data_json.items()))
+        ticker_log_yesterday = collections.OrderedDict(sorted(data_json_yesterday.items()))
 
     ticker_log = dict(ticker_log_today, **ticker_log_yesterday)
 
