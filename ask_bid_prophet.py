@@ -20,17 +20,20 @@ import os
 def create_spread_df():
     print("create_spread_df")
     dt_now = datetime.datetime.now()
-    last_update_min = 0
+
     # フォルダ作成
-    input_folder_name = "./simulation_data/"
+    input_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/simulation_data/"
     out_df_filename = "df_bid-ask_all.dump"
-    if os.path.isfile(out_df_filename):
+    # 15分に一回dataframe更新する
+    if os.path.isfile(out_df_filename) and dt_now.minute % 30 == 0:
         with open(out_df_filename,"rb") as f:
             df_spread = pickle.load(f)
     else:
         # データ読み取り
         data_json_all = {}
-        for day in [14,15,16,17,19,20,21,22,23,24,25,26,27,28,29]:
+        # TODO 今の日付
+        # for day in [14,15,16,17,19,20,21,22,23,24,25,26,27,28,29,30]:
+        for day in range(23,dt_now.day + 1):
             with open(input_folder_name+"2017-10-"+str(day)+"ticker_log.json") as data_file:
                 data_json = json.load(data_file)
 
@@ -74,20 +77,62 @@ def get_prophetmodel(column_name):
     print("finish get_prophetmodel")
     return m
 
-ex_1 = "coincheck"
-ex_2 = "quoine"
+last_update_min = -1
+while True:
+    dt_now = datetime.datetime.now()
+    if dt_now.minute % 10 == 0 and dt_now.minute != last_update_min:
+        try:
 
-df_spread = create_spread_df()
-df_spread=df_spread[df_spread['date']>"2017-10-23"]
+            day = dt_now.day
 
-# coincheck_bid-quoine_ask
-model_ccbid_quask=get_prophetmodel("coincheck_bid-quoine_ask")
+            # フォルダ作成
+            # input_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/simulation_data/"
+            output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/prophet/"+str(dt_now.month)+str(dt_now.day) + "/"
 
-# 今後12時間を予測する
-predict_hour = 12
-future_ccbid_quask = model_ccbid_quask.make_future_dataframe(periods=predict_hour*60, freq = 'min')
-forecast_ccbid_quask = model_ccbid_quask.predict(future_ccbid_quask)
-model_ccbid_quask.plot(forecast_ccbid_quask).savefig('predict_12h.png')
+            if not os.path.exists(output_folder_name):
+                os.makedirs(output_folder_name)
 
-# 要素ごと
-model_ccbid_quask.plot_components(forecast_ccbid_quask).savefig('component.png')
+
+            # output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/prophet/"
+            df_spread = create_spread_df()
+            df_spread=df_spread[df_spread['date']>"2017-10-23"]
+
+            ex_1 = "coincheck"
+            ex_2 = "quoine"
+            model_name = ex_1 + "_bid" + "-"+ex_2+"_ask"
+            # coincheck_bid-quoine_ask
+            model_ccbid_quask=get_prophetmodel(model_name)
+
+            # 今後12時間を予測する
+            predict_hour = 12
+            future_ccbid_quask = model_ccbid_quask.make_future_dataframe(periods=predict_hour*60, freq = 'min')
+            forecast_ccbid_quask = model_ccbid_quask.predict(future_ccbid_quask)
+            model_ccbid_quask.plot(forecast_ccbid_quask).savefig(output_folder_name+ex_1+"-"+ex_2+"_predict_12h.png")
+            # 要素ごと
+            model_ccbid_quask.plot_components(forecast_ccbid_quask).savefig(output_folder_name+ex_1+"-"+ex_2+"component.png")
+
+
+            ex_2 = "coincheck"
+            ex_1 = "quoine"
+            model_name = ex_1 + "_bid" + "-"+ex_2+"_ask"
+            # coincheck_bid-quoine_ask
+            model_ccbid_quask=get_prophetmodel(model_name)
+
+            # 今後12時間を予測する
+            predict_hour = 12
+            future_ccbid_quask = model_ccbid_quask.make_future_dataframe(periods=predict_hour*60, freq = 'min')
+            forecast_ccbid_quask = model_ccbid_quask.predict(future_ccbid_quask)
+            model_ccbid_quask.plot(forecast_ccbid_quask).savefig(output_folder_name+ex_1+"-"+ex_2+"_predict_12h.png")
+            # 要素ごと
+            model_ccbid_quask.plot_components(forecast_ccbid_quask).savefig(output_folder_name+ex_1+"-"+ex_2+"component.png")
+
+
+
+        except Exception as e:
+            print('error')
+            print(e)
+            sentence = str(e)
+            time.sleep(10)
+            continue
+    else:
+        time.sleep(10)

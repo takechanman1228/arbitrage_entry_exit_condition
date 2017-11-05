@@ -85,19 +85,19 @@ while True:
 
             # フォルダ作成
             input_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/simulation_data/"
-            output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/spread_image/"+str(dt_now.month)+str(dt_now.day) + "/"
+            output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/spread_image/"+ datetime.datetime.now().strftime('%Y-%m-%d') + "/"
 
             if not os.path.exists(output_folder_name):
                 os.makedirs(output_folder_name)
 
             # データ読み取り
             # その日
-            with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day)+"ticker_log.json") as data_file:
+            with open(input_folder_name+datetime.datetime.now().strftime('%Y-%m-%d')+"/ticker_log.json") as data_file:
                 data_json_today = json.load(data_file)
                 # ticker_log_today = collections.OrderedDict(sorted(data_json_today.items()))
 
             # 前の日
-            with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day-1)+"ticker_log.json") as data_file:
+            with open(input_folder_name+(datetime.datetime.now()-datetime.timedelta(days=1)).strftime('%Y-%m-%d')+"/ticker_log.json") as data_file:
                 data_json_yesterday = json.load(data_file)
                 ticker_log_yesterday = collections.OrderedDict(sorted(data_json_yesterday.items()))
 
