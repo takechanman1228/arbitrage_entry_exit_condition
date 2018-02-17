@@ -70,6 +70,10 @@ def spread_time_series_plot(period_hour):
     plt.close()
 
 
+day=26
+ex_1 = "coincheck"
+ex_2 = "quoine"
+
 while True:
 
     dt_now = datetime.datetime.now()
