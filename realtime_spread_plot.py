@@ -64,48 +64,62 @@ def spread_time_series_plot(period_hour):
     # df_market_spread.head()
 
     plt.figure()#初期化
-    ax = df_market_spread["coincheck_bid-quoine_ask"].plot(legend=True,ylim=[-6000,6000])
-    ax = df_market_spread["quoine_bid-coincheck_ask"].plot(legend=True,ylim=[-6000,6000])
+    ax = df_market_spread["coincheck_bid-quoine_ask"].plot(legend=True)
+    ax = df_market_spread["quoine_bid-coincheck_ask"].plot(legend=True)
+    # ax = df_market_spread["coincheck_bid-quoine_ask"].plot(legend=True,ylim=[-6000,6000])
+    # ax = df_market_spread["quoine_bid-coincheck_ask"].plot(legend=True,ylim=[-6000,6000])
     plt.savefig(output_folder_name+'timeseries_'+str(period_hour)+'h.png')
     plt.close()
 
+last_update_min = -1
 
 day=26
 ex_1 = "coincheck"
 ex_2 = "quoine"
 
 while True:
-
     dt_now = datetime.datetime.now()
-    #
-    # tstr = '2017-10-26 12:00:00'
-    # dt_now = datetime.datetime.strptime(tstr, '%Y-%m-%d %H:%M:%S')
-    day = dt_now.day
-    last_update_min = 0
-    # フォルダ作成
-    input_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/simulation_data/"
-    output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/spread_image/"+str(dt_now.month)+str(dt_now.day) + "/"
+    if dt_now.minute % 5 == 0 and dt_now.minute != last_update_min:
+        try:
+            dt_now = datetime.datetime.now()
+            #
+            # tstr = '2017-10-26 12:00:00'
+            # dt_now = datetime.datetime.strptime(tstr, '%Y-%m-%d %H:%M:%S')
+            day = dt_now.day
 
-    if not os.path.exists(output_folder_name):
-        os.makedirs(output_folder_name)
+            # フォルダ作成
+            input_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/simulation_data/"
+            output_folder_name = "/Users/admin/Dropbox/bitcoin_exchange_log/spread_image/"+ datetime.datetime.now().strftime('%Y-%m-%d') + "/"
 
-    # データ読み取り
-    # その日
-    with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day)+"ticker_log.json") as data_file:
-        data_json_today = json.load(data_file)
-        # ticker_log_today = collections.OrderedDict(sorted(data_json_today.items()))
+            if not os.path.exists(output_folder_name):
+                os.makedirs(output_folder_name)
 
-    # 前の日
-    with open(input_folder_name+"2017-"+str(dt_now.month)+"-"+str(day-1)+"ticker_log.json") as data_file:
-        data_json_yesterday = json.load(data_file)
-        ticker_log_yesterday = collections.OrderedDict(sorted(data_json_yesterday.items()))
+            # データ読み取り
+            # その日
+            with open(input_folder_name+datetime.datetime.now().strftime('%Y-%m-%d')+"/ticker_log.json") as data_file:
+                data_json_today = json.load(data_file)
+                # ticker_log_today = collections.OrderedDict(sorted(data_json_today.items()))
 
-    data_json = dict(data_json_today, **data_json_yesterday)
-    ticker_log = collections.OrderedDict(sorted(data_json.items()))
+            # 前の日
+            with open(input_folder_name+(datetime.datetime.now()-datetime.timedelta(days=1)).strftime('%Y-%m-%d')+"/ticker_log.json") as data_file:
+                data_json_yesterday = json.load(data_file)
+                ticker_log_yesterday = collections.OrderedDict(sorted(data_json_yesterday.items()))
 
-    df_spread = make_df_spread("coincheck","quoine")
+            data_json = dict(data_json_today, **data_json_yesterday)
+            ticker_log = collections.OrderedDict(sorted(data_json.items()))
 
-    if dt_now.minute % 2 == 0 and dt_now.minute != last_update_min:
+            df_spread = make_df_spread("coincheck","quoine")
+            print("create df success")
+        except Exception as e:
+            print('error')
+            print(e)
+            sentence = str(e)
+            time.sleep(10)
+            continue
+
+        print("start plotting")
+        print(dt_now)
+        print(dt_now.minute, last_update_min)
         plot_two_spreads("coincheck","quoine", 1)
         plot_two_spreads("coincheck","quoine", 3)
         plot_two_spreads("coincheck","quoine", 6)
@@ -113,3 +127,6 @@ while True:
         plot_two_spreads("coincheck","quoine", 24)
         spread_time_series_plot(12)
         last_update_min = dt_now.minute
+
+    else:
+        time.sleep(10)
