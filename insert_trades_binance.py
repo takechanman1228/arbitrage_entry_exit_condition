@@ -27,42 +27,54 @@ conn = mysql.connector.connect(
 )
 cur = conn.cursor()
 
-pair_name = "LTC/BTC"
+# pair_name = "LTC/BTC"
+
 binance = ccxt.binance()
-trade_id_set_prev_loop  = set()
+symbol_l = []
+for symbol in binance.symbols:
+    if symbol[-4:] == "/BTC":
+        symbol_l.append(symbol)
+# trade_id_set_prev_loop  = set()
+trade_id_dict_prev_loop = {}
+for pair_name in symbol_l:
+    trade_id_dict_prev_loop[pair_name] = set()
+
 while True:
-    trades=binance.fetchTrades(pair_name)
-    trade_id_set_this_loop  = set()
-    for trade in trades:
+    for pair_name in symbol_l:
+        print(pair_name)
+        trades=binance.fetchTrades(pair_name)
+        trade_id_set_this_loop  = set()
+        for trade in trades:
 
-        price = trade["price"]
-        amount = trade["amount"]
-        timestamp = trade["timestamp"]
-        trade_id = trade["id"]
-        trade_id_set_this_loop.add(trade_id)
-        if trade["side"] == "sell":
-            side = 1
-        elif trade["side"] == "buy":
-            side = 0
+            price = trade["price"]
+            amount = trade["amount"]
+            timestamp = trade["timestamp"]
+            trade_id = trade["id"]
+            trade_id_set_this_loop.add(trade_id)
+            if trade["side"] == "sell":
+                side = 1
+            elif trade["side"] == "buy":
+                side = 0
 
-        # 前回
-        if trade_id in trade_id_set_prev_loop:
-            sql_string = "INSERT INTO trades \
-            (exchange_name,pair_name,trade_id,timestamp,price,amount,buy_sell_type) \
-            VALUES (%s,%s,%s,%s,%s,%s,%s)"
+            # 前回
+            if trade_id in trade_id_dict_prev_loop[pair_name]:
+                sql_string = "INSERT INTO trades \
+                (exchange_name,pair_name,trade_id,timestamp,price,amount,buy_sell_type) \
+                VALUES (%s,%s,%s,%s,%s,%s,%s)"
 
-            try:
-                cur.execute(sql_string, ["binance",pair_name,trade_id,timestamp,price,amount,side])
-                # cur.execute('INSERT INTO binance_trades (binance_trade_id,timestamp,price,amount,buy_sell_type) VALUES (%s,%s,%s,%s)', [145862691,"2018-02-18T01:50:28.633",0.02052002,2.63045673,1])
-                conn.commit()
-            except:
+                try:
+                    cur.execute(sql_string, ["binance",pair_name,trade_id,timestamp,price,amount,side])
+                    # cur.execute('INSERT INTO binance_trades (binance_trade_id,timestamp,price,amount,buy_sell_type) VALUES (%s,%s,%s,%s)', [145862691,"2018-02-18T01:50:28.633",0.02052002,2.63045673,1])
+                    conn.commit()
+                except:
 
-                conn.rollback()
-                raise
+                    conn.rollback()
+                    raise
 
 
-    print("1秒前との差分個数")
-    # print(trade_id_set_prev_loop.intersection(trade_id_set_this_loop))
-    print(len(trade_id_set_prev_loop.difference(trade_id_set_this_loop)))
-    trade_id_set_prev_loop = trade_id_set_this_loop
-    sleep(1)
+        print("1秒前との差分個数")
+        # print(trade_id_set_prev_loop.intersection(trade_id_set_this_loop))
+        print(len(trade_id_dict_prev_loop[pair_name].difference(trade_id_set_this_loop)))
+        # trade_id_set_prev_loop = trade_id_set_this_loop
+        trade_id_dict_prev_loop[pair_name] = trade_id_set_this_loop
+        sleep(1)
