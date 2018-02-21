@@ -38,8 +38,10 @@ trade_id_dict_prev_loop = {}
 
 while True:
     exchange_name = "binance"
-    percent_list = [0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2]
+    # percent_list = [0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2]
+    percent_list = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.125,0.15,0.175,0.2]
     for pair_name in symbol_l:
+        try:
             ob=binance.fetch_order_book(pair_name)
         # except ccxt.errors.ExchangeError:
         except:
@@ -70,8 +72,8 @@ while True:
                     break
         # 一行挿入
         sql_string = "INSERT INTO orderbook \
-        (exchange_name,pair_name,timestamp,best_ask,`2_5`,`5`,`7_5`,`10`,`12_5`,`15`,`17_5`,`20`) \
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        (exchange_name,pair_name,timestamp,best_ask,`1`,`2`,`3`,`4`,`5`,`6`,`7`,`8`,`9`,`10`,`12_5`,`15`,`17_5`,`20`) \
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
         percent_amount_list = []
         # 2_5,5,7_5,10,12_5,15,17_5,20
         for percent in percent_list:
