@@ -108,4 +108,4 @@ while True:
         print(len(trade_id_dict_prev_loop[pair_name].difference(trade_id_set_this_loop)))
         # trade_id_set_prev_loop = trade_id_set_this_loop
         trade_id_dict_prev_loop[pair_name] = trade_id_set_this_loop
-        sleep(1)
+        sleep(2)
