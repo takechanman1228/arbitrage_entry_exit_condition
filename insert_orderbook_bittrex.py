@@ -56,7 +56,14 @@ while True:
     percent_list = [0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2]
     for pair_name in symbol_l_bittrex:
         print(pair_name)
-        ob=bittrex.fetch_order_book(pair_name)
+        try:
+            ob=bittrex.fetch_order_book(pair_name)
+        # except ccxt.errors.ExchangeError:
+        except:
+            print("order book fetch failed")
+            sleep(60)
+            continue
+
 
         percent_coint_dict = dict.fromkeys(percent_list,0)
         timestamp = ob["timestamp"]

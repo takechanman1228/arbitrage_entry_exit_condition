@@ -35,7 +35,7 @@ symbol_l = [
              'ETC/BTC',
              'BCH/BTC',
              'EOS/BTC',
-             'IOTA/BTC',
+             # 'IOTA/BTC',
              'NEO/BTC',
              'OMG/BTC',
              'SAN/BTC',
@@ -47,9 +47,9 @@ symbol_l = [
               'EDO/BTC',
               'TRX/BTC',
               'ETP/BTC',
-              'QTUM/BTC',
+              # 'QTUM/BTC',
               'SNG/BTC',
-              'QASH/BTC',
+              # 'QASH/BTC',
               'DATA/BTC',
               'REP/BTC',
               'SNT/BTC',
@@ -76,6 +76,7 @@ while True:
         # except ccxt.errors.ExchangeError:
         except:
             print("order book fetch failed")
+            sleep(60)
             continue
 
         percent_coint_dict = dict.fromkeys(percent_list,0)
@@ -117,4 +118,4 @@ while True:
             conn.rollback()
             raise
 
-        sleep(1)
+        sleep(3)

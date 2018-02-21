@@ -30,7 +30,7 @@ symbol_l = [
              'ETC/BTC',
              'BCH/BTC',
              'EOS/BTC',
-             'IOTA/BTC',
+             # 'IOTA/BTC',
              'NEO/BTC',
              'OMG/BTC',
              'SAN/BTC',
@@ -42,9 +42,9 @@ symbol_l = [
               'EDO/BTC',
               'TRX/BTC',
               'ETP/BTC',
-              'QTUM/BTC',
+              # 'QTUM/BTC',
               'SNG/BTC',
-              'QASH/BTC',
+              # 'QASH/BTC',
               'DATA/BTC',
               'REP/BTC',
               'SNT/BTC',
@@ -59,6 +59,7 @@ symbol_l = [
               'RRT/BTC',
 ]
 
+bitfinex = ccxt.bitfinex()
 trade_id_dict_prev_loop = {}
 for pair_name in symbol_l:
     trade_id_dict_prev_loop[pair_name] = set()
@@ -71,6 +72,7 @@ while True:
         # except ccxt.errors.ExchangeError:
         except:
             print("fetch trade failed")
+            sleep(60)
             continue
         # print("len(trades)")
         # print(len(trades))
@@ -108,4 +110,4 @@ while True:
         print(len(trade_id_dict_prev_loop[pair_name].difference(trade_id_set_this_loop)))
         # trade_id_set_prev_loop = trade_id_set_this_loop
         trade_id_dict_prev_loop[pair_name] = trade_id_set_this_loop
-        sleep(2)
+        sleep(5)

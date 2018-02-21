@@ -42,7 +42,15 @@ for pair_name in symbol_l:
 while True:
     for pair_name in symbol_l:
         print(pair_name)
-        trades=binance.fetchTrades(pair_name)
+
+        try:
+            trades=binance.fetchTrades(pair_name)
+        # except ccxt.errors.ExchangeError:
+        except:
+            print("fetch trade failed")
+            sleep(60)
+            continue
+
         trade_id_set_this_loop  = set()
         for trade in trades:
 
@@ -77,4 +85,4 @@ while True:
         print(len(trade_id_dict_prev_loop[pair_name].difference(trade_id_set_this_loop)))
         # trade_id_set_prev_loop = trade_id_set_this_loop
         trade_id_dict_prev_loop[pair_name] = trade_id_set_this_loop
-        sleep(1)
+        sleep(5)

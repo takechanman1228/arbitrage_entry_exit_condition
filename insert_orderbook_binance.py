@@ -40,7 +40,13 @@ while True:
     exchange_name = "binance"
     percent_list = [0.025,0.05,0.075,0.1,0.125,0.15,0.175,0.2]
     for pair_name in symbol_l:
-        ob=binance.fetch_order_book(pair_name)
+            ob=binance.fetch_order_book(pair_name)
+        # except ccxt.errors.ExchangeError:
+        except:
+            print("order book fetch failed")
+            sleep(60)
+            continue
+
         print(pair_name)
         percent_coint_dict = dict.fromkeys(percent_list,0)
         timestamp = ob["timestamp"]
